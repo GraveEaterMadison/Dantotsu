@@ -67,9 +67,10 @@ class CloudflareInterceptor(
 
         val origRequestUrl = originalRequest.url.toString()
         val headers = parseHeaders(originalRequest.headers)
+            .filterKeys { it.equals("User-Agent", ignoreCase = true).not() }
 
         executor.execute {
-            webview = createWebView(originalRequest)
+            webview = createWebView(originalRequest, useDefaultUserAgent = true)
 
             webview?.webViewClient = object : WebViewClientCompat() {
                 override fun onPageFinished(view: WebView, url: String) {
@@ -140,7 +141,7 @@ class CloudflareInterceptor(
     }
 }
 
-private val ERROR_CODES = listOf(403, 503)
+private val ERROR_CODES = listOf(403, 429, 503)
 private val SERVER_CHECK = arrayOf("cloudflare-nginx", "cloudflare")
 private val COOKIE_NAMES = listOf("cf_clearance")
 

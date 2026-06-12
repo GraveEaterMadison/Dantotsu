@@ -81,11 +81,13 @@ abstract class WebViewInterceptor(
         await(30, TimeUnit.SECONDS)
     }
 
-    fun createWebView(request: Request): WebView {
+    fun createWebView(request: Request, useDefaultUserAgent: Boolean = false): WebView {
         return WebView(context).apply {
             setDefaultSettings()
-            // Avoid sending empty User-Agent, Chromium WebView will reset to default if empty
-            settings.userAgentString = request.header("User-Agent") ?: defaultUserAgentProvider()
+            if (!useDefaultUserAgent) {
+                // Avoid sending empty User-Agent, Chromium WebView will reset to default if empty
+                settings.userAgentString = request.header("User-Agent") ?: defaultUserAgentProvider()
+            }
         }
     }
 }
